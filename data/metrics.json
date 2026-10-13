@@ -1,0 +1,53 @@
+{
+  "naive (lag_1)": {
+    "mae": 4.5109,
+    "rmse": 11.0249
+  },
+  "linear regression": {
+    "mae": 4.0582,
+    "rmse": 9.6793
+  },
+  "LightGBM (val)": {
+    "mae": 3.9175,
+    "rmse": 9.4732
+  },
+  "LightGBM (TEST - unseen weeks)": {
+    "mae": 4.5864,
+    "rmse": 10.9635
+  },
+  "policy": {
+    "optimizer_profit_per_week": 28472.77,
+    "hold_profit_per_week": 23592.85,
+    "uplift": 0.2068,
+    "action_mix": {
+      "test_increase": 1341,
+      "apply_markdown": 659
+    },
+    "note": "model-based directional comparison, not a causal claim"
+  },
+  "elasticity": {
+    "FOODS_1": -0.683,
+    "FOODS_3": -0.646,
+    "HOUSEHOLD_1": -0.608,
+    "FOODS_2": -0.565,
+    "HOBBIES_1": -0.471,
+    "HOUSEHOLD_2": -0.393,
+    "HOBBIES_2": -0.19
+  },
+  "config": {
+    "fast_mode": false,
+    "fast_n_series": null,
+    "train_weeks": "0-260",
+    "val_weeks": "261-272",
+    "test_weeks": "273-276",
+    "candidates": [
+      1.0,
+      1.05,
+      0.95,
+      0.9,
+      0.85,
+      0.8,
+      0.7
+    ]
+  }
+}
