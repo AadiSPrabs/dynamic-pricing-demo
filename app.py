@@ -185,24 +185,22 @@ elif page == "Recommendations":
             res = P.optimise(row)
         st.divider()
 
-        disc = (1 - res["mult"]) if res["mult"] < 1 else 0
-        if res["action"] == "test_increase":
-            price_line = (f"${row['sell_price']:.2f} → **${res['price']:.2f}** "
-                          f"(+{res['mult'] - 1:.0%})")
-        elif disc:
-            price_line = (f"${row['sell_price']:.2f} → **${res['price']:.2f}** "
-                          f"({disc:.0%} off)")
-        else:
-            price_line = f"${row['sell_price']:.2f} (no change)"
-
         st.markdown(f"### {row['item_id']} @ {row['store_id']} &nbsp; {action_badge(res['action'])}",
                     unsafe_allow_html=True)
         st.caption(f"Week {int(row['wm_yr_wk'])} · {row['dept_id']} · {row['cat_id']}")
 
-        c1, c2, c3 = st.columns(3)
-        c1.metric("Price", price_line)
-        c2.metric("Expected sales", f"{res['demand']:.0f} units/week")
-        c3.metric("Expected profit", f"${res['profit']:.2f}/week")
+        disc = (1 - res["mult"]) if res["mult"] < 1 else 0
+        if res["action"] == "test_increase":
+            delta_txt = f"+{res['mult'] - 1:.0%}"
+        elif disc:
+            delta_txt = f"-{disc:.0%}"
+        else:
+            delta_txt = None
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("Current price", f"${row['sell_price']:.2f}")
+        c2.metric("Suggested price", f"${res['price']:.2f}", delta=delta_txt)
+        c3.metric("Expected sales", f"{res['demand']:.0f} units/week")
+        c4.metric("Expected profit", f"${res['profit']:.2f}/week")
 
         st.markdown(f"**Why this suggestion?** {res['reason']}.")
         st.markdown(P.ACTION_DESCRIPTIONS[res["action"]])
@@ -244,8 +242,8 @@ elif page == "Price Simulator":
 
     st.markdown(f"**{row['item_id']}** @ {row['store_id']} · {row['dept_id']} &nbsp; "
                 f"{action_badge(res['action'])}", unsafe_allow_html=True)
-    st.caption(f"The app suggests **${res['price']:.2f}** ({ACTION_PLAIN[res['action']].lower()}). "
-               f"Current price ${base:.2f} · assumed unit cost ${cost:.2f}.")
+    st.caption(f"The app suggests **\\${res['price']:.2f}** ({ACTION_PLAIN[res['action']].lower()}). "
+               f"Current price \\${base:.2f} · assumed unit cost \\${cost:.2f}.")
 
     st.subheader("Step 2 — Set your price")
     price = st.slider("Your price ($)", float(round(0.70 * base, 2)),
@@ -263,17 +261,17 @@ elif page == "Price Simulator":
     d_rec = profit - res["profit"]
     d_hold = profit - hold_profit
     if abs(d_rec) < 0.5:
-        st.success(f"🤝 About the same as the app's suggestion (${res['price']:.2f}) — "
+        st.success(f"🤝 About the same as the app's suggestion (\\${res['price']:.2f}) — "
                    f"either price works.")
     elif d_rec > 0:
-        st.success(f"👍 At **${price:.2f}** you'd make about **${profit:.2f}/week** — "
-                   f"roughly **${d_rec:.2f} more** than the app's suggestion.")
+        st.success(f"👍 At **\\${price:.2f}** you'd make about **\\${profit:.2f}/week** — "
+                   f"roughly **\\${d_rec:.2f} more** than the app's suggestion.")
     else:
-        st.warning(f"👎 At **${price:.2f}** you'd make about **${profit:.2f}/week** — "
-                   f"roughly **${-d_rec:.2f} less** than the app's suggestion of "
-                   f"${res['price']:.2f}.")
-    st.caption(f"For reference, simply holding at ${base:.2f} would make about "
-               f"${hold_profit:.2f}/week.")
+        st.warning(f"👎 At **\\${price:.2f}** you'd make about **\\${profit:.2f}/week** — "
+                   f"roughly **\\${-d_rec:.2f} less** than the app's suggestion of "
+                   f"\\${res['price']:.2f}.")
+    st.caption(f"For reference, simply holding at \\${base:.2f} would make about "
+               f"\\${hold_profit:.2f}/week.")
 
     grid = np.linspace(0.70 * base, 1.10 * base, 41)
     ds = np.array([P.demand_at_price(row, p) for p in grid])
